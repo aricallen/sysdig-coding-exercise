@@ -1,3 +1,27 @@
-/**
- * style.css
- */
+table {
+  border-collapse: collapse;
+}
+
+table td {
+  border: 1px solid black; 
+}
+
+table tr:first-child td,
+table tr th {
+  border-top: 0;
+}
+
+table tr td:first-child,
+table tr th  {
+  border-left: 0;
+}
+
+table tr:last-child td,
+table tr th {
+  border-bottom: 0;
+}
+
+table tr td:last-child,
+table tr th {
+  border-right: 0;
+}

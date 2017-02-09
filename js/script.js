@@ -1,13 +1,99 @@
-var xhr = new XMLHttpRequest();
+const token = '8aef9517-3070-4090-b55e-83296cee8cd1';
+const endpoint = 'https://app-staging.sysdigcloud.com/api/events';
+const tableId = 'events-table';
+var table = document.getElementById(tableId);
 
-xhr.open("GET", "https://app.sysdigcloud.com/api/alerts/62");
-xhr.setRequestHeader("Authorization", "Bearer 8aef9517-3070-4090-b55e-83296cee8cd1");
+const requestHeaders = {
+  Authorization: `Bearer ${token}`
+};
 
-xhr.addEventListener("readystatechange", function () {
-  if (this.readyState === this.DONE) {
-    // Done!
-    console.log(this.responseText);
+const config = { 
+  method: 'GET',
+  headers: requestHeaders
+};
+
+/**
+ * using the keys from an object in the GET response,
+ * setup the headers for the table
+ * @param  {JSON} response
+ * @return {Promise}
+ */
+const plotHeaders = (response) => {
+  const events = response.events;
+  const sampleEventData = events[0];
+  if (typeof sampleEventData !== 'object') {
+    throw new Error('sampleEventData is expected to be of type object');
   }
-});
+  const dataKeys = Object.keys(sampleEventData);
+  const header = document.createElement('THEAD');
+  const headerRow = document.createElement('TR');
+  header.appendChild(headerRow);
+  dataKeys.forEach((dataPoint) => {
+    const headerCell = document.createElement('TH');
+    headerCell.innerText = dataPoint;
+    header.appendChild(headerCell);
+  });
+  table.appendChild(header);
+  const returnPromise = new Promise((resolve) => resolve(response));
+  return returnPromise;
+};
 
-xhr.send(data);
+/**
+ * parse the response from API call and build out table
+ * @param  {Object} response
+ *         array of events with data points
+ * @return {Promise}
+ */
+const plotEvents = (response) => {
+  const events = response.events;
+  if (events.constructor !== Array) {
+    throw new Error('plotEvents expects parameter to be of type Array');
+  }
+
+  events.forEach((eventLog) => {
+    if (typeof eventLog !== 'object') {
+      throw new Error('event logs should be of type Object');
+    }
+
+    // each event has its own row
+    const row = document.createElement('TR');
+
+    // get all the data points for each cell
+    const eventDataPoints = Object.keys(eventLog);
+    eventDataPoints.forEach((eventDataPointKey) => {
+      let htmlToDisplay = '';
+      const eventDataPoint = eventLog[eventDataPointKey];
+
+      // edge case: for tags
+      // check to see if there is another level
+      // if there is, represent points as a comma separated list
+      if (typeof eventDataPoint === 'object' && Object.keys(eventDataPoint).length !== 0) {
+        let multiDataToDisplay = '';
+        const multiDataKeys = Object.keys(eventDataPoint);
+        multiDataKeys.forEach((multiDataKey) => {
+          multiDataToDisplay += `${multiDataKey}: ${eventDataPoint[multiDataKey]}, `;
+        });
+        // remove trailing comma
+        const removeTrailingCommaRegexp = /, $/;
+        htmlToDisplay = multiDataToDisplay.replace(removeTrailingCommaRegexp, '');
+      } else {
+        // a non multi data point
+        htmlToDisplay = eventDataPoint;
+      }
+
+      const cell = document.createElement('TD');
+      cell.innerHTML = htmlToDisplay;
+      row.appendChild(cell);
+    });
+    table.appendChild(row);
+  });
+};
+
+
+fetch(endpoint, config)
+  .then((response) => response.json())
+  .catch((error) => console.log('response.json() error:', error))
+  .then(plotHeaders)
+  .catch((error) => console.log('plotHeaders() error:', error))
+  .then(plotEvents)
+  .catch((error) => console.log('plotEvents() error:', error));
