@@ -2,26 +2,30 @@ table {
   border-collapse: collapse;
 }
 
-table td {
+table td,
+thead th {
   border: 1px solid black; 
 }
 
-table tr:first-child td,
-table tr th {
+thead th {
   border-top: 0;
 }
 
 table tr td:first-child,
-table tr th  {
+thead th:first-child  {
   border-left: 0;
 }
 
 table tr:last-child td,
-table tr th {
+thead th:last-child {
   border-bottom: 0;
 }
 
 table tr td:last-child,
-table tr th {
+thead th:last-child {
   border-right: 0;
+}
+
+td {
+  padding: 8px;
 }

@@ -27,12 +27,12 @@ const plotHeaders = (response) => {
   const dataKeys = Object.keys(sampleEventData);
   const header = document.createElement('THEAD');
   const headerRow = document.createElement('TR');
-  header.appendChild(headerRow);
   dataKeys.forEach((dataPoint) => {
     const headerCell = document.createElement('TH');
     headerCell.innerText = dataPoint;
-    header.appendChild(headerCell);
+    headerRow.appendChild(headerCell);
   });
+  header.appendChild(headerRow);
   table.appendChild(header);
   const returnPromise = new Promise((resolve) => resolve(response));
   return returnPromise;
@@ -82,18 +82,47 @@ const plotEvents = (response) => {
       }
 
       const cell = document.createElement('TD');
+      cell.classList.add(eventDataPointKey);
       cell.innerHTML = htmlToDisplay;
       row.appendChild(cell);
     });
     table.appendChild(row);
   });
+  const returnPromise = new Promise((resolve) => resolve(response));
+  return returnPromise;
 };
 
+const formatTimestamps = () => {
+  const timestampCells = Array.from(document.getElementsByClassName('timestamp'));
+  timestampCells.forEach((timestampCell) => {
+    const timestamp = parseInt(timestampCell.innerText.trim());
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    const formatted = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    timestampCell.innerText = formatted;
+  });
+};
 
-fetch(endpoint, config)
+/**
+ * only load polyfill if needed
+ */
+const isModernBrowser = typeof window.fetch === 'function';
+if (!isModernBrowser) {
+  const script = document.createElement('SCRIPT');
+  script.src = 'js/fetch-polyfill.js';
+  document.head.appendChild(script);
+}
+
+window.fetch(endpoint, config)
   .then((response) => response.json())
   .catch((error) => console.log('response.json() error:', error))
   .then(plotHeaders)
   .catch((error) => console.log('plotHeaders() error:', error))
   .then(plotEvents)
-  .catch((error) => console.log('plotEvents() error:', error));
+  .catch((error) => console.log('plotEvents() error:', error))
+  .then(formatTimestamps);
