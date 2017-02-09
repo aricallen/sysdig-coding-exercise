@@ -106,6 +106,8 @@ const formatTimestamps = () => {
     const formatted = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     timestampCell.innerText = formatted;
   });
+  // return another promise for potential additional chaining
+  return Promise.resolve();
 };
 
 /**
