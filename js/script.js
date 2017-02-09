@@ -27,6 +27,7 @@ const plotHeaders = (response) => {
   const dataKeys = Object.keys(sampleEventData);
   const header = document.createElement('THEAD');
   const headerRow = document.createElement('TR');
+  headerRow.classList.add('header-row');
   dataKeys.forEach((dataPoint) => {
     const headerCell = document.createElement('TH');
     headerCell.innerText = dataPoint;
@@ -57,6 +58,7 @@ const plotEvents = (response) => {
 
     // each event has its own row
     const row = document.createElement('TR');
+    row.classList.add('row');
 
     // get all the data points for each cell
     const eventDataPoints = Object.keys(eventLog);
