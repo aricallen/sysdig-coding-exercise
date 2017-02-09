@@ -26,6 +26,17 @@ thead th:last-child {
   border-right: 0;
 }
 
-td {
+td, th {
   padding: 8px;
+}
+
+/**
+ * utility classes
+ */
+.align-center {
+  text-align: center;
+}
+
+.inline-block {
+  display: inline-block;
 }
