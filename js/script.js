@@ -13,6 +13,16 @@ const config = {
 };
 
 /**
+ * only load polyfill if needed
+ */
+const hasArrayFrom = typeof Array.from === 'function';
+if (!hasArrayFrom) {
+  const script = document.createElement('SCRIPT');
+  script.src = 'js/array.from.polyfill.js';
+  document.head.appendChild(script);
+}
+
+/**
  * using the keys from an object in the GET response,
  * setup the headers for the table
  * @param  {JSON} response
@@ -118,7 +128,7 @@ const formatTimestamps = () => {
 const isModernBrowser = typeof window.fetch === 'function';
 if (!isModernBrowser) {
   const script = document.createElement('SCRIPT');
-  script.src = 'js/fetch-polyfill.js';
+  script.src = 'js/window.fetch.polyfill.js';
   document.head.appendChild(script);
 }
 
